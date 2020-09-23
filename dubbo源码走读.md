@@ -4,17 +4,17 @@
 
 dubbo自定义标签的命名空间是***DubboNamespaceHandler***，自定义标签解析从***DubboBeanDefinitionParser***
 
-![image-20200917200535625](.\img\dubbo\image-20200917200535625.png)
+![image-20200917200535625](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200917200535625.png)
 
 开始解析。
 
 服务提供者端***ServiceBean***在Spring容器启动后会监听容器刷新事件，然后开始导出服务。
 
-![image-20200921102130762](.\img\dubbo\image-20200921102130762.png)
+![image-20200921102130762](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200921102130762.png)
 
 导出服务的主要逻辑在父类***ServiceConfig***中，首先加载配置的注册中心地址，然后根据配置的协议列表循环导出服务到注册中心中。
 
-![image-20200921103456287](.\img\dubbo\image-20200921103456287.png)
+![image-20200921103456287](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200921103456287.png)
 
 ```java
  private void doExportUrlsFor1Protocol(ProtocolConfig protocolConfig, List<URL> registryURLs) {
@@ -108,13 +108,13 @@ dubbo自定义标签的命名空间是***DubboNamespaceHandler***，自定义标
 
 经过层层协议包装器的包装，最终返回一个InJvm导出器保存在***ServiceConfig***实例变量**exporters**中。
 
-![image-20200921115045313](.\img\dubbo\image-20200921115045313.png)
+![image-20200921115045313](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200921115045313.png)
 
 然后远程导出服务，即将服务导出到注册中心。获取**Invoker**是最终使用JavaAssist技术将一个**Wrapper**类
 
 封装进***AbstractProxyInvoker***进行代理的。
 
-![image-20200921150807372](.\img\dubbo\image-20200921150807372.png)
+![image-20200921150807372](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200921150807372.png)
 
 ```java
  @Override
@@ -266,7 +266,7 @@ ZK注册中心的订阅监听逻辑。
 
 ​											**doLocalExport方法调用  Dubbo协议导出堆栈**
 
-![image-20200921154555623](.\img\dubbo\image-20200921154555623.png)
+![image-20200921154555623](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200921154555623.png)
 
 ```java
 
@@ -316,11 +316,11 @@ ZK注册中心的订阅监听逻辑。
 
 
 
-![image-20200917201150021](.\img\dubbo\image-20200917201150021.png)
+![image-20200917201150021](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200917201150021.png)
 
 由于***ReferenceBean***实现了***FactoryBean***了接口，所以Spring会调用***getObject***这个方法获取对应服务提供者对象的代理类，然后会调用从***ReferenceConfig***继承来的***get***方法，继而触发继承的初始化方法。
 
-![image-20200917201933416](.\img\dubbo\image-20200917201933416.png)
+![image-20200917201933416](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200917201933416.png)
 
 ```java
 @SuppressWarnings({"unchecked", "rawtypes", "deprecation"})
@@ -346,7 +346,7 @@ private T createProxy(Map<String, String> map) {
 
 由RegistryProtocol 协议对象生成Invoker
 
-![image-20200918102549539](.\img\dubbo\image-20200918102549539.png)
+![image-20200918102549539](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200918102549539.png)
 
 ```java
  private <T> Invoker<T> doRefer(Cluster cluster, Registry registry, Class<T> type, URL url) {
@@ -395,13 +395,13 @@ public class FailoverCluster implements Cluster {
 
 init方法最后创建一个包含可***MockClusterInvoker***实例对象的目标接口的代理实例。
 
-![image-20200918112916948](.\img\dubbo\image-20200918112916948.png)
+![image-20200918112916948](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200918112916948.png)
 
 
 
 方法调用时，将方法名和参数封装到***RpcInvocation***中，然后由***MockClusterInvoker***的**Invoke**执行，但是真正执行的是**FailOverClusterInvoker**继承**AbstractClusterInvoker**的**invoke**方法。
 
-![image-20200918114734670](.\img\dubbo\image-20200918114734670.png)
+![image-20200918114734670](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200918114734670.png)
 
 ```java
 @Override

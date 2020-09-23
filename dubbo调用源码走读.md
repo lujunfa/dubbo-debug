@@ -4,7 +4,7 @@
 
 消费者端发起调用。
 
-![image-20200922110750962](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20200922110750962.png)
+![image-20200922110750962](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200922110750962.png)
 
 ```java
 //MockClusterInvoker
@@ -48,19 +48,19 @@
 
 消费者端请求服务过程。
 
-![image-20200922150209144](.\img\dubbo\image-20200922150209144.png)
+![image-20200922150209144](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200922150209144.png)
 
 
 
 服务端接收请求过程。netty监听处理器监听消息，然后将事件扔进线程池处理。
 
-![image-20200922155108956](.\img\dubbo\image-20200922155108956.png)
+![image-20200922155108956](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200922155108956.png)
 
-![image-20200922154448622](.\img\dubbo\image-20200922154448622.png)
+![image-20200922154448622](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200922154448622.png)
 
 最终进入调用目标对象的过程线程栈。
 
-![image-20200922155336710](.\img\dubbo\image-20200922155336710.png)
+![image-20200922155336710](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200922155336710.png)
 
 
 
