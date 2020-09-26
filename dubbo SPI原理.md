@@ -209,13 +209,13 @@ dubbo将从
 
 ##### 																dubbo spi加载配置文件
 
-![image-20200923195824327](.\img\dubbo\image-20200923195824327.png)
+![image-20200923195824327](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200923195824327.png)
 
-![image-20200925174703413](.\img\dubbo\image-20200925174703413.png)
+![image-20200925174703413](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200925174703413.png)
 
 根据文件配置的类路径加载类。
 
-![image-20200923194930374](.\img\dubbo\image-20200923194930374.png)
+![image-20200923194930374](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200923194930374.png)
 
 
 
@@ -268,7 +268,7 @@ private T injectExtension(T instance) {
 
 **Protocol**接口没有对应的**adaptive**类，需要通过字节码生成技术生成对应的adaptive类。
 
-![image-20200926181049633](.\img\dubbo\image-20200926181049633.png)
+![image-20200926181049633](https://github.com/lujunfa/dubbo-debug/blob/master/img/dubbo/image-20200926181049633.png)
 
 ```java
 //运行时生成的Protocol接口的adaptive类
