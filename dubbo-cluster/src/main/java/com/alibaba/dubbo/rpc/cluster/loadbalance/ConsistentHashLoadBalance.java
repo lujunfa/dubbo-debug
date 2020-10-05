@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * ConsistentHashLoadBalance
- *
+ *一致性负载均衡
  */
 public class ConsistentHashLoadBalance extends AbstractLoadBalance {
 
@@ -55,6 +55,7 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalance {
 
     private static final class ConsistentHashSelector<T> {
 
+        //
         private final TreeMap<Long, Invoker<T>> virtualInvokers;
 
         private final int replicaNumber;

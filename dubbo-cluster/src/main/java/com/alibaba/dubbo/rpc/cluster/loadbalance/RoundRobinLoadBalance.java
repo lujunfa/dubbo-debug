@@ -42,6 +42,7 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
     
     protected static class WeightedRoundRobin {
         private int weight;
+        //根据current 大小来选择Invoker
         private AtomicLong current = new AtomicLong(0);
         private long lastUpdate;
         public int getWeight() {
@@ -89,6 +90,7 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
     @Override
     protected <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
         String key = invokers.get(0).getUrl().getServiceKey() + "." + invocation.getMethodName();
+        //该方法的所有的提供者Map缓存
         ConcurrentMap<String, WeightedRoundRobin> map = methodWeightMap.get(key);
         if (map == null) {
             methodWeightMap.putIfAbsent(key, new ConcurrentHashMap<String, WeightedRoundRobin>());
@@ -113,11 +115,14 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
                 weightedRoundRobin = map.get(identifyString);
             }
             if (weight != weightedRoundRobin.getWeight()) {
-                //weight changed
+                //weight changed，如果权重变了，则标志量重置为0
                 weightedRoundRobin.setWeight(weight);
             }
             long cur = weightedRoundRobin.increaseCurrent();
             weightedRoundRobin.setLastUpdate(now);
+            /**
+             * 最大券重的Invoker被选中
+             */
             if (cur > maxCurrent) {
                 maxCurrent = cur;
                 selectedInvoker = invoker;
@@ -125,6 +130,7 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
             }
             totalWeight += weight;
         }
+        //如果调用者数目变了
         if (!updateLock.get() && invokers.size() != map.size()) {
             if (updateLock.compareAndSet(false, true)) {
                 try {
@@ -132,6 +138,7 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
                     ConcurrentMap<String, WeightedRoundRobin> newMap = new ConcurrentHashMap<String, WeightedRoundRobin>();
                     newMap.putAll(map);
                     Iterator<Entry<String, WeightedRoundRobin>> it = newMap.entrySet().iterator();
+                    //判断更新时间超过循环周期即6分钟的移除掉，重新计算
                     while (it.hasNext()) {
                         Entry<String, WeightedRoundRobin> item = it.next();
                         if (now - item.getValue().getLastUpdate() > RECYCLE_PERIOD) {
@@ -145,6 +152,7 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
             }
         }
         if (selectedInvoker != null) {
+            //将券重和的负数设置为标志量current，这样下次被调度到的的概率就比较小
             selectedWRR.sel(totalWeight);
             return selectedInvoker;
         }

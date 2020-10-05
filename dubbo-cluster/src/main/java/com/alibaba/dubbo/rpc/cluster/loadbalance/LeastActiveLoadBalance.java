@@ -48,6 +48,7 @@ public class LeastActiveLoadBalance extends AbstractLoadBalance {
             int active = RpcStatus.getStatus(invoker.getUrl(), invocation.getMethodName()).getActive(); // Active number
             int afterWarmup = getWeight(invoker, invocation); // Weight
             if (leastActive == -1 || active < leastActive) { // Restart, when find a invoker having smaller least active value.
+                //首次迭代提供者列表时或者当遇到更小active时重置leastCount，leastActive，totalWeight，firstWeight等参数。
                 leastActive = active; // Record the current least active value
                 leastCount = 1; // Reset leastCount, count again based on current leastCount
                 leastIndexs[0] = i; // Reset
@@ -55,9 +56,11 @@ public class LeastActiveLoadBalance extends AbstractLoadBalance {
                 firstWeight = afterWarmup; // Record the weight the first invoker
                 sameWeight = true; // Reset, every invoker has the same weight value?
             } else if (active == leastActive) { // If current invoker's active value equals with leaseActive, then accumulating.
+                //如果又发现一个和最小active同样大的提供者时，记录下标，累加券重。
                 leastIndexs[leastCount++] = i; // Record index number of this invoker
                 totalWeight += afterWarmup; // Add this invoker's weight to totalWeight.
                 // If every invoker has the same weight?
+                //如果同样active的提供者，但是weight权重不一样，设置sameWeight为false
                 if (sameWeight && i > 0
                         && afterWarmup != firstWeight) {
                     sameWeight = false;
@@ -71,11 +74,13 @@ public class LeastActiveLoadBalance extends AbstractLoadBalance {
         }
         if (!sameWeight && totalWeight > 0) {
             // If (not every invoker has the same weight & at least one invoker's weight>0), select randomly based on totalWeight.
+            //随机生成一个权重位移。
             int offsetWeight = random.nextInt(totalWeight) + 1;
             // Return a invoker based on the random value.
             for (int i = 0; i < leastCount; i++) {
                 int leastIndex = leastIndexs[i];
                 offsetWeight -= getWeight(invokers.get(leastIndex), invocation);
+                //逐个遍历最小active提供者列表，然后用权重位移逐渐递减，第一个减为0的提供者被选中
                 if (offsetWeight <= 0)
                     return invokers.get(leastIndex);
             }

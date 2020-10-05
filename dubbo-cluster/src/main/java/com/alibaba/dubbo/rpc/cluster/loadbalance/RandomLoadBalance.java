@@ -25,6 +25,7 @@ import java.util.Random;
 
 /**
  * random load balance.
+ * 随机负载均衡，即将所有实例的券重加起来然后得到一个0到券重和的随机值，然后再拿这个随机值依次减各个实例的券重的值，第一个减为负的则被选中。
  *
  */
 public class RandomLoadBalance extends AbstractLoadBalance {
