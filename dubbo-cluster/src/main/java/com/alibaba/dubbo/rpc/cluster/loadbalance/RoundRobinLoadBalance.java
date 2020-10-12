@@ -32,8 +32,20 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Round robin load balance.
- * 
- * Smoothly round robin's implementation @since 2.6.5 
+ * 平滑轮询加权负载均衡算法。
+ * Smoothly round robin's implementation @since 2.6.5
+ *
+ * <pre>
+ *     假设有 N 台实例 S = {S1, S2, …, Sn}，配置权重 W = {W1, W2, …, Wn}，有效权重 CW = {CW1, CW2, …, CWn}。每个实例 i 除了存在一个配置权重 Wi 外，还存在一个当前有效权重 CWi，且 CWi 初始化为 Wi；指示变量 currentPos 表示当前选择的实例 ID，初始化为 -1；所有实例的配置权重和为 weightSum；
+ *
+ * 那么，调度算法可以描述为：
+ * 1、初始每个实例 i 的 当前有效权重 CWi 为 配置权重 Wi，并求得配置权重和 weightSum；
+ * 2、选出 当前有效权重 最大 的实例，将 当前有效权重 CWi 减去所有实例的 权重和 weightSum，且变量 currentPos 指向此位置；
+ * 3、将每个实例 i 的 当前有效权重 CWi 都加上 配置权重 Wi；
+ * 4、取到变量 currentPos 指向的实例；
+ * 5、每次调度重复上述步骤 2、3、4；
+ *
+ * </pre>
  */
 public class RoundRobinLoadBalance extends AbstractLoadBalance {
     public static final String NAME = "roundrobin";
@@ -41,8 +53,9 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
     private static int RECYCLE_PERIOD = 60000;
     
     protected static class WeightedRoundRobin {
+        //代表节点配置权重
         private int weight;
-        //根据current 大小来选择Invoker
+        //代表节点有效权重
         private AtomicLong current = new AtomicLong(0);
         private long lastUpdate;
         public int getWeight() {
@@ -52,6 +65,8 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
             this.weight = weight;
             current.set(0);
         }
+
+        //平滑轮询加权算法就是当前有效权重+节点配置权重
         public long increaseCurrent() {
             return current.addAndGet(weight);
         }
@@ -115,9 +130,10 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
                 weightedRoundRobin = map.get(identifyString);
             }
             if (weight != weightedRoundRobin.getWeight()) {
-                //weight changed，如果权重变了，则标志量重置为0
+                //weight changed，如果权重变了，则当前有效权重current重置为0
                 weightedRoundRobin.setWeight(weight);
             }
+            //配置权重+当前有效权重=更新后的有效权重
             long cur = weightedRoundRobin.increaseCurrent();
             weightedRoundRobin.setLastUpdate(now);
             /**
@@ -152,7 +168,7 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
             }
         }
         if (selectedInvoker != null) {
-            //将券重和的负数设置为标志量current，这样下次被调度到的的概率就比较小
+            //被选中的提供者的有效权重-总的权重值=选中提供者的更新后的有效权重
             selectedWRR.sel(totalWeight);
             return selectedInvoker;
         }

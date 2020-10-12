@@ -40,7 +40,7 @@ public class LeastActiveLoadBalance extends AbstractLoadBalance {
         int leastActive = -1; // The least active value of all invokers
         int leastCount = 0; // The number of invokers having the same least active value (leastActive)
         int[] leastIndexs = new int[length]; // The index of invokers having the same least active value (leastActive)
-        int totalWeight = 0; // The sum of with warmup weights
+        int totalWeight = 0; // The sum of with warmup weights，记录所有最少权重提供者的权重值
         int firstWeight = 0; // Initial value, used for comparision
         boolean sameWeight = true; // Every invoker has the same weight value?
         for (int i = 0; i < length; i++) {
@@ -73,6 +73,7 @@ public class LeastActiveLoadBalance extends AbstractLoadBalance {
             return invokers.get(leastIndexs[0]);
         }
         if (!sameWeight && totalWeight > 0) {
+            //如果不是每个提供者的权重都相同，并且总配置权重大于0，则根据各个提供者的权重比例随机挑选一个为选中提供者
             // If (not every invoker has the same weight & at least one invoker's weight>0), select randomly based on totalWeight.
             //随机生成一个权重位移。
             int offsetWeight = random.nextInt(totalWeight) + 1;

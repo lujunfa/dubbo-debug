@@ -48,6 +48,7 @@ public class RandomLoadBalance extends AbstractLoadBalance {
             }
         }
         if (totalWeight > 0 && !sameWeight) {
+            //产生一个总权数之内的随机值，然后看这个随机值落在哪个提供者权值区间内就调用哪个提供者。
             // If (not every invoker has the same weight & at least one invoker's weight>0), select randomly based on totalWeight.
             int offset = random.nextInt(totalWeight);
             // Return a invoker based on the random value.

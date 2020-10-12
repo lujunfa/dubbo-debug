@@ -32,7 +32,7 @@ public abstract class AbstractLoadBalance implements LoadBalance {
 
     /**
      * <pre>
-     *     ww= 启动时间/预热时间/weight
+     *     ww= （启动时间/预热时间）* weight
      *     返回 = 如果ww小于1则直接返回1，否则返回ww和weight中较小的值
      * </pre>
      * @param uptime
@@ -59,6 +59,7 @@ public abstract class AbstractLoadBalance implements LoadBalance {
     protected int getWeight(Invoker<?> invoker, Invocation invocation) {
         int weight = invoker.getUrl().getMethodParameter(invocation.getMethodName(), Constants.WEIGHT_KEY, Constants.DEFAULT_WEIGHT);
         if (weight > 0) {
+            //获得远端提供者的时间戳
             long timestamp = invoker.getUrl().getParameter(Constants.REMOTE_TIMESTAMP_KEY, 0L);
             if (timestamp > 0L) {
                 //系统启动时间
